@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html>
     <head>
-      <!--Load the AJAX API-->
-      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-      <script type="text/javascript">
+        <title>Chart</title>
+        <!--Load the AJAX API-->
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="js/chart-core.js"></script>
+        <script type="text/javascript">
   
         // Load the Visualization API and the corechart package.
         google.charts.load('current', {'packages':['corechart']});
@@ -12,62 +20,90 @@
         // Set a callback to run when the Google Visualization API is loaded.
         google.charts.setOnLoadCallback(init);
 
-        function getData(cb) {
-            // $.ajax({
-            //     url: "https://my.api.mockaroo.com/chart.json?key=e86ebea0",
-            //     method: "GET",
-            //     success: function(result) {
-            //         cb(result);
-            //     }
-            // });
-            cb(
-                [
-                    {
-                        "id":1,
-                        "colName":"ut",
-                        "slices":178,
-                        "cost":649
-                    },
-                    {
-                        "id":2,
-                        "colName":"nulla neque",
-                        "slices":149,
-                        "cost":558
-                    },
-                    {
-                        "id":3,
-                        "colName":"vestibulum eget",
-                        "slices":175,
-                        "cost":715
-                    },
-                    {
-                        "id":4,
-                        "colName":"eu pede",
-                        "slices":115,
-                        "cost":500
-                    },
-                    {
-                        "id":5,
-                        "colName":"lacinia",
-                        "slices":124,
-                        "cost":396
-                    }
-                ]
-            );
-        }
-
         function init() {
-            handlePieChart();
-            // handleComboChart();
+            handleDonutChart();
+            handleComboChart();
+            // handlePieChart();
+            
             // handleLineChart();
             // handleColumnChart();
+        }
+
+        function handleDonutChart() {
+            var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+            getData(function(result) {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'name');
+                data.addColumn('number', 'count');
+                data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}});
+                var data = setupData(data, result);
+                var colors = getDefaultColor(3);
+                var options = Object.assign({}, getDefaultOptions(), {
+                    title :'Overview Report',
+                    titleTextStyle: {
+                        color: '#7bb8ed', fontSize: 25
+                    },
+                    colors: colors,
+                    pieHole: 0.4,
+                    focusTarget: 'category',
+                    tooltip:{
+                        isHtml: true,
+                        trigger: 'selection'
+                    },
+                    legend: 'none'
+                });
+                setAlwayVisibleTooptip(chart, data);
+                worker(chart, data, options);
+            });
+        }
+
+        function handleComboChart() {
+            var chart = new google.visualization.ComboChart(document.getElementById('chart_div2'));
+            var colors = getDefaultColor(2);
+            var data = google.visualization.arrayToDataTable([
+                ['Month', 'Visitor', 'Recieve'],
+                ['01 Nov 2017',  523,      523],
+                ['02 Nov 2017',  677,      677],
+                ['03 Nov 2017',  365,      365],
+                ['04 Nov 2017',  766,      766],
+                ['05 Nov 2017',  546,      546]
+            ]);
+            var options = Object.assign({}, getDefaultOptions(), {
+                title : 'Monthly Cost',
+                colors: colors,
+                titleTextStyle: {
+                    color: '#7bb8ed', fontSize: 25
+                },
+                legend: {
+                    position: 'none'
+                },
+                // vAxis: {title: 'Cups'},
+                hAxis: {title: 'Date'},
+                seriesType: 'bars',
+                series: {
+                    1: {
+                        type: 'line',
+                        targetAxisIndex: 1
+                    }
+                },
+                vAxes: [
+                    {
+                        title: 'Number Of Visitor'
+                    },
+                    {
+                        title:'Recieve'
+                    }
+                ]
+            });
+            worker(chart, data, options);
         }
 
         function handlePieChart() {
             var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
             getData(function(result) {
                 var data = setupData(result);
-                var options = getOptions();
+                var options = getDefaultOptions();
+                setAlwayVisibleTooptip(chart, data);
                 worker(chart, data, options);
             });
         }
@@ -76,7 +112,7 @@
             var chart = new google.visualization.LineChart(document.getElementById('chart_div2'));
             getData(function(result) {
                 var data = setupData(result);
-                var options = getOptions();
+                var options = getDefaultOptions();
                 worker(chart, data, options);
             });
         }
@@ -85,116 +121,32 @@
             var chart = new google.visualization.ColumnChart(document.getElementById('chart_div3'));
             getData(function(result) {
                 var data = setupData(result);
-                var options = getOptions();
+                var options = getDefaultOptions();
                 worker(chart, data, options);
             });
         }
 
-        function handleComboChart() {
-            var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
-            var data = google.visualization.arrayToDataTable([
-                ['Month', 'Bolivia', 'Ecuador'],
-                ['2004/05',  523,      523],
-                ['2005/06',  677,      677],
-                ['2006/07',  365,      365],
-                ['2007/08',  766,      766],
-                ['2008/09',  546,      546]
-            ]);
-            var options = {
-                itle : 'Monthly Coffee Production by Country',
-                width :600,
-                height :400,
-                vAxis: {title: 'Cups'},
-                hAxis: {title: 'Month'},
-                seriesType: 'bars',
-                series: {1: {type: 'line'}}
-            };
-            worker(chart, data, options);
-        }
-
-        function worker(chart, data, options) {
-            getData(function(result) {
-                // var data = setupData(result);
-                chart.draw(data, options);
-                // setInterval(function() {
-                //     getData(function(result) {
-                //         var data = setupData(result);
-                //         var options = getOptions();
-                //         chart.draw(data, options);
-                //     });
-                // }, 10000);
-            });
-        }
-
-        function setupData(result) {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Topping');
-            data.addColumn('number', 'Slices');
-            // data.addColumn('number', 'Cost');
-            for (var index in result) {
-                var row = result[index];
-                // data.addRow([row.colName, row.slices, row.cost]);
-                data.addRow([row.colName, row.slices]);
-            }
-            
-            return data;
-        }
-
-        function getOptions() {
-            return  {
-                'title':'How Much Pizza I Ate Last Night',
-                'width':600,
-                'height':400,
-                animation:{
-                    duration: 700,
-                    easing: 'out',
-                },
-                tooltip:{
-                    trigger:'selection'
-                }
-            };
-        }
-  
-        // Callback that creates and populates a data table,
-        // instantiates the pie chart, passes in the data and
-        // draws it.
-        // function drawChart() {
-  
-        //   // Create the data table.
-        //   var data = new google.visualization.DataTable();
-        //   data.addColumn('string', 'Topping');
-        //   data.addColumn('number', 'Slices');
-        //   data.addColumn('number', 'Cost');
-        //   data.addRows([
-        //     ['Mushrooms', 3, 50],
-        //     ['Onions', 1, 20],
-        //     ['Olives', 1, 30],
-        //     ['Zucchini', 1, 12],
-        //     ['Pepperoni', 2, 16]
-        //   ]);
-  
-        //   // Set chart options
-        //   var options = {'title':'How Much Pizza I Ate Last Night',
-        //                  'width':400,
-        //                  'height':300};
-  
-        //   // Instantiate and draw our chart, passing in some options.
-        //   var pChart = new google.visualization.PieChart(document.getElementById('chart_div'));
-        //   pChart.draw(data, options);
-
-        //   var lChart = new google.visualization.LineChart(document.getElementById('chart_div2'));
-        //   lChart.draw(data, options);
-
-        //   var cChart = new google.visualization.ColumnChart(document.getElementById('chart_div3'));
-        //   cChart.draw(data, options);
-        // }
+        
       </script>
     </head>
   
     <body>
       <!--Div that will hold the pie chart-->
-      <div id="chart_div">update</div>Update
-      <div id="chart_div2"></div>
-      <div id="chart_div3"></div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm">
+                    <div id="chart_div"></div>
+                </div>
+                <div class="col-sm">
+                    <div id="chart_div2"></div>
+                </div>
+                <div class="col-sm">
+                    <div id="chart_div3"></div>
+                </div>
+                <div class="col-sm">
+                    <div id="chart_div4"></div>
+                </div>
+            </div>
+        </div>
     </body>
   </html>
