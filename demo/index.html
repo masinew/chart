@@ -37,6 +37,7 @@
 
         // 1
         function handleDonutChart() {
+            // TODO: Link tooptip to its slice
             var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
             getData(function(result) {
                 var data = new google.visualization.DataTable();
@@ -74,6 +75,18 @@
                 ['02 Nov 2017',  677,      677],
                 ['03 Nov 2017',  365,      365],
                 ['04 Nov 2017',  766,      766],
+                ['01 Nov 2017',  523,      523],
+                ['02 Nov 2017',  677,      677],
+                ['03 Nov 2017',  365,      365],
+                ['04 Nov 2017',  766,      766],
+                ['01 Nov 2017',  523,      523],
+                ['02 Nov 2017',  677,      677],
+                ['03 Nov 2017',  365,      365],
+                ['04 Nov 2017',  766,      766],
+                ['01 Nov 2017',  523,      523],
+                ['02 Nov 2017',  677,      677],
+                ['03 Nov 2017',  365,      365],
+                ['04 Nov 2017',  766,      766],
                 ['05 Nov 2017',  546,      546]
             ]);
             var options = Object.assign({}, getDefaultOptions(), {
@@ -101,7 +114,10 @@
                     {
                         title:'Recieve'
                     }
-                ]
+                ],
+                candlestick: {
+                    hollowIsRising: true
+                }
             });
             worker(chart, data, options);
         }
@@ -127,7 +143,8 @@
                     legend: 'none',
                     chartArea: {
                         left:20,top:65,width:'80%',height:'75%'
-                    }
+                    },
+                    enableInteractivity: false
                 });
 
                 function placeMarker(dataTable) {
@@ -163,8 +180,9 @@
                     },
                     legend: 'none',
                     chartArea: {
-                        left:20,top:65,width:'80%',height:'75%'
-                    }
+                        left:20,top:65,width:'80%',height:'75%'                    
+                    },
+                    enableInteractivity: false
                 });
 
                 worker(pie2, data, options);
@@ -188,8 +206,10 @@
                     },
                     legend: 'none',
                     chartArea: {
+                        backgroundColor: 'red',
                         left:20,top:65,width:'80%',height:'75%'
-                    }
+                    },
+                    enableInteractivity: false
                 });
 
                 worker(pie3, data, options);
@@ -227,9 +247,12 @@
             data.addColumn('number', 'In');
             data.addColumn('number', 'Out');
             data.addRows([
-                ['12 Nov 20172222222', 0, 0],    ['13 Nov 2017', 10, 5],   ['14 Nov 2017', 23, 15],
+                ['12 Nov 2017', 0, 0],    ['13 Nov 2017', 10, 5],   ['14 Nov 2017', 23, 15],
                 ['15 Nov 2017', 0, 0],    ['16 Nov 2017', 10, 5],   ['17 Nov 2017', 23, 15],
-                ['18 Nov 2017', 0, 0],    ['19 Nov 2017', 10, 5],   ['20 Nov 2017', 23, 15]
+                // ['18 Nov 2017', 0, 0],    ['19 Nov 2017', 10, 5],   ['20 Nov 2017', 23, 15],
+                // ['21 Nov 2017', 0, 0],    ['22 Nov 2017', 10, 5],   ['23 Nov 2017', 23, 15],
+                // ['24 Nov 2017', 0, 0],    ['25 Nov 2017', 10, 5],   ['26 Nov 2017', 23, 15],
+                ['27 Nov 2017', 0, 0],    ['28 Nov 2017', 10, 5],   ['29 Nov 2017', 23, 15]
             ]);
 
             var options = Object.assign({}, getDefaultOptions(), {
@@ -240,6 +263,7 @@
                     title: 'Popularity'
                 },
                 series: {
+                    0: {curveType: 'function'},
                     1: {curveType: 'function'}
                 },
                 legend: {
