@@ -50,11 +50,17 @@ function worker(chart, data, options) {
 }
 
 function setAlwayVisibleTooptip(chart, data) {
+    function setAllSelection() {
+        chart.setSelection([{row:0,column:null}, {row:1,column:null}, {row:2,column:null}]);
+    }
+
     google.visualization.events.addListener(chart, 'ready', function(e) {
         var numberOfRows = data.getNumberOfRows();
-        // for (var i=0; i<numberOfRows; i++) {
-            chart.setSelection([{row:0,column:null}, {row:1,column:null}, {row:2,column:null}]);
-        // }
+        setAllSelection();
+    });
+
+    google.visualization.events.addListener(chart, 'select', function(e) {
+        setAllSelection();
     });
 }
 
