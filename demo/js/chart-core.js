@@ -1,3 +1,9 @@
+// Load the Visualization API and the corechart package.
+google.charts.load('current', {'packages':['corechart']});
+google.charts.load('current', {'packages':['line']});
+google.charts.load('current', {'packages':['table']});
+google.charts.load('current', {'packages':['gauge']});
+
 function getData(cb) {
     // $.ajax({
     //     url: "https://my.api.mockaroo.com/chart.json?key=e86ebea0",
@@ -101,4 +107,27 @@ function createCustomTooltip(des, color) {
             <font size="2em">${des}</font>
         </div>
     `;
+}
+
+
+// Prepare to handle all charts
+function GoogleChart() {
+    var defaultOptions = {
+
+    }
+
+    this.getDonutChart = function(elementId) {
+        var elem = document.getElementById(elementId);
+        return new google.visualization.PieChart(elem);
+    }
+
+    this.gethandleComboChart = function(elementId) {
+        var elem = document.getElementById(elementId);
+        return new google.visualization.ComboChart(elem);
+    }
+
+    this.getGaugeChart = function(elementId) {
+        var elem = document.getElementById(elementId);
+        return new google.visualization.Gauge(elem);
+    }
 }
