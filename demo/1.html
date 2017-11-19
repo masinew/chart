@@ -10,9 +10,8 @@
 
     <!-- JS Resource -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="js/chart-core.js"></script>
-    <title>Champ</title>
+    <title>Overview Report</title>
 </head>
 <body>
     <div class="container-fluid">
@@ -32,27 +31,45 @@
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'name');
                 data.addColumn('number', 'count');
-                data.addRow(['Location 1', 175]);
-                data.addRow(['Location 1', 23]);
-                data.addRow(['Location 1', 45]);
-                data.addRow(['Location 1', 40]);
+                data.addRow(['Location 1', 62]);
+                data.addRow(['Location 1', 20]);
+                data.addRow(['Location 1', 60]);
                 var colors = getDefaultColor(4);
-                var options = Object.assign({}, getDefaultOptions(), {
+                var options = {
                     title :'Overview Report',
+                    colors: colors,
                     titleTextStyle: {
                         color: '#7bb8ed', 
                         fontSize: 25
                     },
-                    colors: colors,
                     pieHole: 0.4,
                     tooltip:{
                         text: 'value',
                         trigger: 'selection'
                     },
-                    legend: 'none'
-                });
+                    legend: 'none',
+                    width: '100%',
+                    height: 500
+                };
                 
+                setAlwayVisibleTooptip(chart, data);
                 chart.draw(data, options);
+            }
+
+            function setAlwayVisibleTooptip(chart, data) {
+                function setAllSelection() {
+                    var rowSize = this.getNumberOfRows();
+                    var rowArr = [];
+                    for (var i=0; i<rowSize; i++) {
+                        rowArr.push({row:i,column:null});
+                    }
+                    
+                    chart.setSelection(rowArr);
+                }
+
+                google.visualization.events.addListener(chart, 'ready', setAllSelection.bind(data));
+
+                google.visualization.events.addListener(chart, 'select', setAllSelection.bind(data));
             }
         </script>
 </body>
