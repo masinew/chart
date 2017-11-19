@@ -10,10 +10,50 @@
 
     <!-- JS Resource -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="js/chart-core.js"></script>
-    <title></title>
+    <title>Champ</title>
 </head>
 <body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md">
+                <div id="chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+            // Set a callback to run when the Google Visualization API is loaded.
+            google.charts.setOnLoadCallback(init);
     
+            function init() {
+                var chart = new google.visualization.PieChart(document.getElementById('chart'));
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'name');
+                data.addColumn('number', 'count');
+                data.addRow(['Location 1', 175]);
+                data.addRow(['Location 1', 23]);
+                data.addRow(['Location 1', 45]);
+                data.addRow(['Location 1', 40]);
+                var colors = getDefaultColor(4);
+                var options = Object.assign({}, getDefaultOptions(), {
+                    title :'Overview Report',
+                    titleTextStyle: {
+                        color: '#7bb8ed', 
+                        fontSize: 25
+                    },
+                    colors: colors,
+                    pieHole: 0.4,
+                    tooltip:{
+                        text: 'value',
+                        trigger: 'selection'
+                    },
+                    legend: 'none'
+                });
+                
+                chart.draw(data, options);
+            }
+        </script>
 </body>
 </html>
