@@ -43,7 +43,7 @@
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'name');
                 data.addColumn('number', 'count');
-                data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}});
+                // data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}});
                 var data = setupData(data, result);
                 var colors = getDefaultColor(3);
                 var options = Object.assign({}, getDefaultOptions(), {
@@ -55,7 +55,8 @@
                     colors: colors,
                     pieHole: 0.4,
                     tooltip:{
-                        isHtml: true,
+                        // isHtml: true,
+                        text: 'value',
                         trigger: 'selection'
                     },
                     legend: 'none'
@@ -63,6 +64,21 @@
                 setAlwayVisibleTooptip(chart, data);
                 worker(chart, data, options);
             });
+
+            function setupData(data, result) {
+                // var data = new google.visualization.DataTable();
+                // data.addColumn('string', 'Topping');
+                // data.addColumn('number', 'Slices');
+                // data.addColumn('number', 'Cost');
+                var colors = getDefaultColor(result.length);
+                for (var index in result) {
+                    var row = result[index];
+                    // data.addRow([row.colName, row.slices, row.cost]);
+                    data.addRow([row.name, row.count]);
+                }
+                
+                return data;
+            }
         }
 
         // 2
