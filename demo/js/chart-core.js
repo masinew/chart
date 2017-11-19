@@ -4,18 +4,6 @@ google.charts.load('current', {'packages':['line']});
 google.charts.load('current', {'packages':['table']});
 google.charts.load('current', {'packages':['gauge']});
 
-function getDefaultOptions() {
-    return  {
-        // title :'People counting',
-        width: 600,
-        height: 400,
-        animation:{
-            duration: 700,
-            easing: 'out',
-        }
-    };
-}
-
 function getDefaultColor(range) {
     var colors = [
         /*"#82b4e0", "#92c4ef", "#b2d0ea", */"#3366cc","#dc3912","#ff9900","#109618","#990099","#0099c6","#dd4477","#66aa00","#b82e2e","#316395","#994499","#22aa99","#aaaa11","#6633cc","#e67300","#8b0707","#651067","#329262","#5574a6","#3b3eac","#b77322","#16d620","#b91383","#f4359e","#9c5935","#a9c413","#2a778d","#668d1c","#bea413","#0c5922","#743411"
