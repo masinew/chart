@@ -11,13 +11,23 @@
     <!-- JS Resource -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="js/chart-core.js"></script>
-    <title></title>
+    <title>Overview Report</title>
+    <style>
+        .center {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
             <div class="col-md">
                 <div id="chart"></div>
+            </div>
+        </div>
+        <div class="row" style="padding-top: 50px;">
+            <div class="col-md">
+                <div id="chart_table"></div>
             </div>
         </div>
     </div>
@@ -27,7 +37,61 @@
         google.charts.setOnLoadCallback(init);
 
         function init() {
+            handleLineChart();
+            handleTableChart();
+        }
+
+        function handleLineChart() {
+            var data = getData();
+            var colors = getDefaultColor(4);
+            var options = {
+                title :'Overview Report',
+                colors: colors,
+                titleTextStyle: {
+                    color: '#7bb8ed', 
+                    fontSize: 25
+                },
+                pieHole: 0.4,
+                tooltip:{
+                    text: 'value',
+                    trigger: 'selection'
+                },
+                legend: 'none',
+                width: '100%',
+                height: 500
+            };
             
+            var chart = new google.visualization.PieChart(document.getElementById('chart'));
+            setAlwayVisibleTooptip(chart, data);
+            chart.draw(data, options);
+        }
+
+        function handleTableChart() {
+            var data = getData();
+
+            var options = {
+                width: '100%', 
+                height: 500,
+                cssClassNames: {
+                    tableCell: 'center'
+                }
+            };
+
+            var chart = new google.visualization.Table(document.getElementById('chart_table'));
+            chart.draw(data, options);
+        }
+
+        function getData() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Location');
+            data.addColumn('number', 'In');
+            data.addColumn('number', 'Percentage(%)');
+            data.addRow(['Location 1 (Camera 1, 3)', 1600, {v: 16, f: '16%'}]);
+            data.addRow(['Location 2 (Camera 4, 5, 6)', 4000, {v: 40, f: '40%'}]);
+            data.addRow(['Location 3 (Camera 7, 8)', 2400, {v: 24, f: '24%'}]);
+            data.addRow(['Location 4 (Camera 9)', 2000, {v: 20, f: '20%'}]);
+
+            return data;
         }
     </script>
 </body>
