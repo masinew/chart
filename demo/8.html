@@ -11,13 +11,23 @@
     <!-- JS Resource -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="js/chart-core.js"></script>
-    <title></title>
+    <title>Location Report</title>
+    <style>
+        .center {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
             <div class="col-md">
                 <div id="chart"></div>
+            </div>
+        </div>
+        <div class="row" style="padding-top: 50px;">
+            <div class="col-md">
+                <div id="chart_table"></div>
             </div>
         </div>
     </div>
@@ -27,7 +37,73 @@
         google.charts.setOnLoadCallback(init);
 
         function init() {
-            
+            handleLineChart();
+            handleTableChart();
+        }
+
+        function handleLineChart() {
+            var data = getData();
+            var options = {
+                title: 'Visitor Report',
+                width: '100%',
+                height: 500,
+                titleTextStyle: {
+                    color: '#7bb8ed', 
+                    fontSize: 25
+                },
+                hAxis: {
+                    title: 'Date'
+                },
+                vAxis: {
+                    title: 'Number of Visitor'
+                },
+                // series: {
+                //     0: {curveType: 'function'},
+                //     1: {curveType: 'function'}
+                // },
+                legend: {
+                    position: 'bottom'
+                }
+            };
+            var chart = new google.visualization.LineChart(document.getElementById('chart'));
+            chart.draw(data, options);
+        }
+
+        function handleTableChart() {
+            var data = getData();
+
+            var options = {
+                width: '100%', 
+                height: 500,
+                cssClassNames: {
+                    tableCell: 'center'
+                }
+            };
+
+            var chart = new google.visualization.Table(document.getElementById('chart_table'));
+            chart.draw(data, options);
+        }
+
+        function getData() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Date');
+            data.addColumn('number', 'Location 1');
+            data.addColumn('number', 'Location 2');
+            data.addColumn('number', 'Location 3');
+            data.addColumn('number', 'Location 4');
+            data.addColumn('number', 'Location 5');
+            data.addColumn('number', 'Location 6');
+            data.addColumn('number', 'Location 7');
+            data.addRows([
+                ['12 Nov 2017', 10, 15, 40, 36, 66, 12, 99],    ['13 Nov 2017', 15, 50, 12, 44, 33, 99, 45],   ['14 Nov 2017', 150, 30, 23, 123, 53, 99, 65],
+                ['15 Nov 2017', 40, 10, 55, 98, 12, 65, 34],    ['16 Nov 2017', 50, 15, 99, 123, 54, 12, 99],   ['17 Nov 2017', 200, 40, 54, 12,88, 12, 54],
+                ['18 Nov 2017', 32, 18, 12, 44, 33, 99, 45],    ['19 Nov 2017', 10, 19, 23, 123, 53, 99, 65],   ['20 Nov 2017', 10, 10, 23, 123, 53, 99, 65],
+                ['21 Nov 2017', 10, 20, 54, 12, 88, 98, 54],    ['22 Nov 2017', 10, 25, 23, 123, 53, 99, 65],   ['23 Nov 2017', 50, 11, 55, 98, 12, 65, 34],
+                ['24 Nov 2017', 33, 14, 23, 123, 53, 99, 65],    ['25 Nov 2017', 16, 10, 54, 12, 98, 12, 54],   ['26 Nov 2017', 80, 112, 50, 15, 99, 123, 99],
+                ['27 Nov 2017', 35, 55, 15, 99, 123, 54, 12],    ['28 Nov 2017', 80, 1, 55, 98, 12, 65, 34],   ['29 Nov 2017', 1, 152, 44, 33, 99, 45, 88]
+            ]);
+
+            return data;
         }
     </script>
 </body>
