@@ -15,3 +15,19 @@ function getDefaultColor(range) {
         return true;
     });
 }
+
+function setAlwayVisibleTooptip(chart, data) {
+    function setAllSelection() {
+        var rowSize = this.getNumberOfRows();
+        var rowArr = [];
+        for (var i=0; i<rowSize; i++) {
+            rowArr.push({row:i,column:null});
+        }
+        
+        chart.setSelection(rowArr);
+    }
+
+    google.visualization.events.addListener(chart, 'ready', setAllSelection.bind(data));
+
+    google.visualization.events.addListener(chart, 'select', setAllSelection.bind(data));
+}
