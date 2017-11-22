@@ -16,19 +16,66 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md">
-                <div id="chart">Coming Soon!!</div>
+            <div class="col-lg-4">
+                <div id="chart_1"></div>
+            </div>
+            <div class="col-lg-4">
+                <div id="chart_2"></div>
+            </div>
+            <div class="col-lg-4">
+                <div id="chart_3"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // Set a callback to run when the Google Visualization API is loaded.
-        google.charts.setOnLoadCallback(init);
+            // Set a callback to run when the Google Visualization API is loaded.
+            google.charts.setOnLoadCallback(init);
 
-        function init() {
-            
-        }
-    </script>
+            function randomData() {
+                return Math.round(Math.random() * 100);
+            }
+    
+            function init() {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'name');
+                data.addColumn('number', 'count');
+                data.addRow(['Location 1', 62]);
+                data.addRow(['Location 1', 20]);
+                var colors = getDefaultColor(4);
+                var options = {
+                    title :'Overview Report',
+                    colors: colors,
+                    titleTextStyle: {
+                        color: '#7bb8ed', 
+                        fontSize: 25
+                    },
+                    tooltip:{
+                        text: 'value',
+                        trigger: 'selection'
+                    },
+                    slices: {
+                        1: {
+                            color: 'transparent'
+                        }
+                    },
+                    chartArea: {
+                        width: '100%'
+                    },
+                    legend: 'none',
+                    width: '100%',
+                    height: 500
+                };
+                
+                var colors = getDefaultColor(3);
+                for(var i=1; i<=3; i++) {
+                    var chart = new google.visualization.PieChart(document.getElementById('chart_' + i));
+                    var cusOptions = Object.assign({}, options, {
+                        colors: [colors[i-1]]
+                    });
+                    chart.draw(data, cusOptions);
+                }
+            }
+        </script>
 </body>
 </html>
