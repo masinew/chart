@@ -42,7 +42,7 @@
         google.charts.setOnLoadCallback(init);
 
         function init() {
-            handleLineChart();
+            handleColumnChart();
             handleTableChart();
         }
 
@@ -68,7 +68,7 @@
 
         var tableChart;
         var isFilterd = 0;
-        function handleLineChart() {
+        function handleColumnChart() {
             var data = getData();
             var colors = getDefaultColor(4);
             var options = {

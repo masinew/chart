@@ -11,13 +11,38 @@
     <!-- JS Resource -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="js/chart-core.js"></script>
-    <title></title>
+    <title>Target Monitoring</title>
+    <style>
+        .center {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
+            <div class="col-lg-4" style="position: relative;">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div id="chart"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div id="chart_info" style="text-align: center;">
+                            <!-- <h3>Target: 10,000 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Actual: 2,500</h3>
+                            <h3>100% - 75% = 25%</h3> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div id="chart_column"></div>
+            </div>
+        </div>
+        <div class="row" style="padding-top: 50px;">
             <div class="col-md">
-                <div id="chart"></div>
+                <div id="chart_table"></div>
             </div>
         </div>
     </div>
@@ -27,7 +52,112 @@
         google.charts.setOnLoadCallback(init);
 
         function init() {
+            handleGaugeChart();
+            handleColumnChart();
+            handleTableChart();
+        }
+
+        function handleGaugeChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'X');
+            data.addColumn('number', 'In');
+            data.addRows([
+                ['12 Nov 2017', {v: 25, f: '25%'}]
+            ]);
+
+            var options = {
+                width: '100%',
+                height: 500,
+                greenFrom: 0, greenTo: 60,
+                yellowFrom: 60, yellowTo: 80,
+                redFrom: 80, redTo: 100,
+                
+                majorTicks: ['0%', '20%', '40%', '60%', '80%', '100%'],
+                minorTicks: 20
+            };
+
+            var chartElem = document.getElementById('chart');
+            var chart = new google.visualization.Gauge(chartElem);
+            google.visualization.events.addListener(chart, 'ready', 
+                repositionGaugeChartToCenter.bind(chartElem, setGaugeInfo)
+            );
+            chart.draw(data, options);
+
+            function repositionGaugeChartToCenter(fn) {
+                var chartDrawing = this.children[0];
+                var moveLeft = (this.offsetWidth - chartDrawing.offsetWidth) / 2;
+                chartDrawing.style.position = "relative";
+                chartDrawing.style.left = moveLeft + "px";
+                fn();
+            }
+
+            function setGaugeInfo() {
+                var info = document.getElementById('chart_info');
+                info.innerHTML = `
+                    <h3>Target: 10,000 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Actual: 2,500</h3>
+                    <h3>100% - 75% = 25%</h3>
+                `;
+            }
+        }
+
+        function handleColumnChart() {
+            var data = getData();
+            var colors = getDefaultColor(4);
+            var options = {
+                title : 'Monthly Cost',
+                colors: colors,
+                width: '100%',
+                height: 500,
+                titleTextStyle: {
+                    color: '#7bb8ed', fontSize: 25
+                },
+                legend: {
+                    position: 'bottom'
+                },
+                // vAxis: {title: 'Cups'},
+                hAxis: {title: 'Date'},
+                vAxes: [
+                    {
+                        title: 'Number Of Visitor'
+                    }
+                ],
+                candlestick: {
+                    hollowIsRising: true
+                },
+                chartArea: {
+                    width: '100%'
+                }
+            };
             
+            var chart = new google.visualization.ColumnChart(document.getElementById('chart_column'));
+            chart.draw(data, options);
+        }
+
+        function handleTableChart() {
+            var data = getData();
+
+            var options = {
+                width: '100%', 
+                height: 500,
+                cssClassNames: {
+                    tableCell: 'center'
+                }
+            };
+
+            tableChart = new google.visualization.Table(document.getElementById('chart_table'));
+            tableChart.draw(data, options);
+        }
+
+        function getData() {
+            var data = google.visualization.arrayToDataTable([
+                ['Date', 'Target', 'Actual'],
+                ['12 Nov 2017', 10, 66],    ['13 Nov 2017', 15, 54],   ['14 Nov 2017', 150, 12],
+                ['15 Nov 2017', 40, 43],    ['16 Nov 2017', 50, 34],   ['17 Nov 2017', 200, 99],
+                ['18 Nov 2017', 32, 22],    ['19 Nov 2017', 10, 34],   ['20 Nov 2017', 10, 99],
+                ['21 Nov 2017', 10, 66],    ['22 Nov 2017', 10, 77],   ['23 Nov 2017', 50, 12]
+            ]);
+
+            return data;
         }
     </script>
 </body>
