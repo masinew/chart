@@ -11,13 +11,26 @@
     <!-- JS Resource -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="js/chart-core.js"></script>
-    <title></title>
+    <title>Target Monitoring</title>
+    <style>
+        .center {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
+            <div class="col-lg-6">
+                <div id="chart_1"></div>
+            </div>
+            <div class="col-lg-6">
+                <div id="chart_2"></div>
+            </div>
+        </div>
+        <div class="row" style="padding-top: 50px;">
             <div class="col-md">
-                <div id="chart"></div>
+                <div id="chart_table"></div>
             </div>
         </div>
     </div>
@@ -27,7 +40,90 @@
         google.charts.setOnLoadCallback(init);
 
         function init() {
+            var colors = getDefaultColor(2);
+            var data = getData();
+            var options = {
+                title : 'Monthly Cost',
+                colors: colors,
+                width: '100%',
+                height: 500,
+                titleTextStyle: {
+                    color: '#7bb8ed', fontSize: 25
+                },
+                legend: {
+                    position: 'none'
+                },
+                // vAxis: {title: 'Cups'},
+                hAxis: {title: 'Date'},
+                seriesType: 'bars',
+                series: {
+                    1: {
+                        type: 'line',
+                        targetAxisIndex: 1
+                    }
+                },
+                vAxes: [
+                    {
+                        title: 'Number Of Visitor'
+                    },
+                    {
+                        title:'Recieve',
+                        textStyle: {
+                            color: 'red'
+                        },
+                        titleTextStyle: {
+                            color: 'red'
+                        }
+                    }
+                ],
+                candlestick: {
+                    hollowIsRising: true
+                },
+                chartArea: {
+                    width: '100%',
+                    left: '10%',
+                    right: '10%'
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            };
             
+            for (var i=1; i<=2; i++) {
+                var chart = new google.visualization.ComboChart(document.getElementById('chart_' + i));
+                chart.draw(data, options);
+            }
+
+            handleTableChart();
+        }
+
+        function handleTableChart() {
+            var data = getData();
+
+            var options = {
+                width: '100%', 
+                height: 500,
+                cssClassNames: {
+                    tableCell: 'center'
+                }
+            };
+
+            tableChart = new google.visualization.Table(document.getElementById('chart_table'));
+            tableChart.draw(data, options);
+        }
+
+        function getData() {
+            var data = google.visualization.arrayToDataTable([
+                ['Date', 'Visitor', 'Recieve'],
+                ['12 Nov 2017', 10, 15],    ['13 Nov 2017', 15, 50],   ['14 Nov 2017', 150, 30],
+                ['15 Nov 2017', 40, 10],    ['16 Nov 2017', 50, 15],   ['17 Nov 2017', 200, 40],
+                ['18 Nov 2017', 32, 18],    ['19 Nov 2017', 10, 19],   ['20 Nov 2017', 10, 10],
+                ['21 Nov 2017', 10, 20],    ['22 Nov 2017', 10, 25],   ['23 Nov 2017', 50, 11],
+                ['24 Nov 2017', 33, 14],    ['25 Nov 2017', 16, 10],   ['26 Nov 2017', 80, 112],
+                ['27 Nov 2017', 35, 5],     ['28 Nov 2017', 80, 1],    ['29 Nov 2017', 1, 150]
+            ]); 
+
+            return data;
         }
     </script>
 </body>
