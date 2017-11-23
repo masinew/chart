@@ -7,66 +7,94 @@
 
     <!-- Style Sheet -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="http://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+    
 
     <!-- JS Resource -->
+    <script type="text/javascript" src="http://cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="http://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+    
     
     <title>Search Panel</title>
 </head>
 <body>
     <div class="container">
-        <form id="search_form">
-        <div class="row" style="padding-top: 50px;">
-            <div class="col-lg-6">
-                <!-- Search Panel -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="radio" name="search_criteria" id="search_day" value="Date" checked> Date
-                            </label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="radio" name="search_criteria" id="search_week" value="Week"> Week
-                            </label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="radio" name="search_criteria" id="search_month" value="Month"> Month
-                            </label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="radio" name="search_criteria" id="search_quarter" value="Quarter"> Quarter
-                            </label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="radio" name="search_criteria" id="search_year" value="Year"> Year
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <hr/>
-                
-                    <div class="row" id="search_content_container">
-                        
-                    </div>
+        <!-- Form -->
+        <form id="search_form" onsubmit="return onSubmit()">
+            <div class="row" style="padding-top: 50px;">
+                <div class="col-lg-6">
+                    <!-- Search Panel -->
                     <div class="row">
                         <div class="col-lg-12">
-                            <button type="submit" class="btn btn-primary">Apply</button>
-                            <button type="reset" class="btn btn-default">Cancel</button>
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="radio" name="search_criteria" id="search_day" value="date" checked> Date
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="radio" name="search_criteria" id="search_week" value="week"> Week
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="radio" name="search_criteria" id="search_month" value="month"> Month
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="radio" name="search_criteria" id="search_quarter" value="quarter"> Quarter
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="radio" name="search_criteria" id="search_year" value="year"> Year
+                                </label>
+                            </div>
                         </div>
                     </div>
-                
-                <!-- Search Panel -->
+                    <hr/>
+                    
+                        <div class="row" id="search_content_container">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="col-form-label" for="formGroupExampleInput">From</label>
+                                    <input class="form-control" type="text" name="from" value="" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="col-form-label" for="formGroupExampleInput">To</label>
+                                    <input class="form-control" type="text" name="to" value="" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <button type="submit" id="submit" class="btn btn-primary">Apply</button>
+                                <button type="reset" class="btn btn-default">Cancel</button>
+                            </div>
+                        </div>
+                    
+                    <!-- Search Panel -->
+                </div>
             </div>
-        </div>
+            <!-- Form -->
         </form>
     </div>
 
     <script>
+        $(function() {
+            $('input[name="from"]').daterangepicker({
+                singleDatePicker: true
+            });
+            $('input[name="to"]').daterangepicker({
+                singleDatePicker: true
+            });
+        });
         var target = document.getElementById('search_content_container');
+        var form = document.getElementById('search_form');
 
         var radioDay = document.getElementById('search_day');
         var radioWeek = document.getElementById('search_week');
@@ -74,8 +102,24 @@
         var radioQuarter = document.getElementById('search_quarter');
         var radioYear = document.getElementById('search_year');
 
+        function onSubmit() {
+            var allData = $("#search_form").serializeArray();
+            allData.forEach(function(data) {
+                console.log(data);
+            });
+            return false;
+        }
+
         radioDay.addEventListener('click', function() {
             target.innerHTML = getDayHtmlCriteria();
+            $(function() {
+                $('input[name="from"]').daterangepicker({
+                    singleDatePicker: true
+                });
+                $('input[name="to"]').daterangepicker({
+                    singleDatePicker: true
+                });
+            });
         });
         radioWeek.addEventListener('click', function() {
             target.innerHTML = getWeekHtmlCriteria();
@@ -92,13 +136,45 @@
 
         function getDayHtmlCriteria() {
             return `
-            
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="col-form-label" for="formGroupExampleInput">From</label>
+                        <input class="form-control" type="text" name="from" value="" />
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="col-form-label" for="formGroupExampleInput">To</label>
+                        <input class="form-control" type="text" name="to" value="" />
+                    </div>
+                </div>
             `;
         }
 
         function getWeekHtmlCriteria() {
             return `
-            
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="col-form-label" for="formGroupExampleInput">Year</label>
+                        <select class="custom-select form-control">
+                            <option value="2017" selected>2017</option>
+                            <option value="2016">2016</option>
+                            <option value="2015">2015</option>
+                            <option value="2014">2014</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="col-form-label" for="formGroupExampleInput">Week</label>
+                        <select class="custom-select form-control">
+                            <option value="w1" selected>Week 1 (1-6 January)</option>
+                            <option value="w2">Week 2 (7-13 January)</option>
+                            <option value="w3">Week 3 (14-20 January)</option>
+                            <option value="w4">Week 4 (21-27 January)</option>
+                        </select>
+                    </div>
+                </div>
             `;
         }
 
@@ -139,13 +215,44 @@
 
         function getQuarterHtmlCriteria() {
             return `
-            
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="col-form-label" for="formGroupExampleInput">Year</label>
+                        <select class="custom-select form-control">
+                            <option value="2017" selected>2017</option>
+                            <option value="2016">2016</option>
+                            <option value="2015">2015</option>
+                            <option value="2014">2014</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="col-form-label" for="formGroupExampleInput">Quarter</label>
+                        <select class="custom-select form-control">
+                            <option value="q1" selected>Quarter 1(Jan 1 - March 31)</option>
+                            <option value="q2">Quarter 2(April 1 - Jun 30)</option>
+                            <option value="q3">Quarter 3(July 1 - September 30)</option>
+                            <option value="q4">Quarter 4(October 1 - December 31)</option>
+                        </select>
+                    </div>
+                </div>
             `;
         }
 
         function getYearHtmlCriteria() {
             return `
-            
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="col-form-label" for="formGroupExampleInput">Year</label>
+                        <select class="custom-select form-control">
+                            <option value="2017" selected>2017</option>
+                            <option value="2016">2016</option>
+                            <option value="2015">2015</option>
+                            <option value="2014">2014</option>
+                        </select>
+                    </div>
+                </div>
             `;
         }
     </script>
