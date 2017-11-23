@@ -104,11 +104,23 @@
 
         function onSubmit() {
             var allData = $("#search_form").serializeArray();
-            allData.forEach(function(data) {
-                console.log(data);
+            var str = '';
+            allData.forEach(function(data, index) {
+                if (index == 0) {
+                    str = 'searchType: ' + data.value;
+                    return;
+                }
+
+                str += ', ' + data.name + ': ' + data.value;
             });
+
+            alert(str);
             return false;
         }
+
+        $('body').on('submit', '#search_form', function(){
+            // console.log(this);
+        });
 
         radioDay.addEventListener('click', function() {
             target.innerHTML = getDayHtmlCriteria();
@@ -156,7 +168,7 @@
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Year</label>
-                        <select class="custom-select form-control">
+                        <select name="year" class="custom-select form-control">
                             <option value="2017" selected>2017</option>
                             <option value="2016">2016</option>
                             <option value="2015">2015</option>
@@ -167,7 +179,7 @@
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Week</label>
-                        <select class="custom-select form-control">
+                        <select name="week" class="custom-select form-control">
                             <option value="w1" selected>Week 1 (1-6 January)</option>
                             <option value="w2">Week 2 (7-13 January)</option>
                             <option value="w3">Week 3 (14-20 January)</option>
@@ -183,7 +195,7 @@
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Year</label>
-                        <select class="custom-select form-control">
+                        <select name="year" class="custom-select form-control">
                             <option value="2017" selected>2017</option>
                             <option value="2016">2016</option>
                             <option value="2015">2015</option>
@@ -194,19 +206,19 @@
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Month</label>
-                        <select class="custom-select form-control">
-                            <option value="2017" selected>January</option>
-                            <option value="2016">Febuary</option>
-                            <option value="2015">March</option>
-                            <option value="2015">April</option>
-                            <option value="2015">May</option>
-                            <option value="2015">June</option>
-                            <option value="2015">July</option>
-                            <option value="2015">August</option>
-                            <option value="2015">September</option>
-                            <option value="2015">October</option>
-                            <option value="2015">November</option>
-                            <option value="2015">December</option>
+                        <select name="month" class="custom-select form-control">
+                            <option value="1" selected>January</option>
+                            <option value="2">Febuary</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
                         </select>
                     </div>
                 </div>
@@ -218,7 +230,7 @@
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Year</label>
-                        <select class="custom-select form-control">
+                        <select name="year" class="custom-select form-control">
                             <option value="2017" selected>2017</option>
                             <option value="2016">2016</option>
                             <option value="2015">2015</option>
@@ -229,7 +241,7 @@
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Quarter</label>
-                        <select class="custom-select form-control">
+                        <select name="quarter" class="custom-select form-control">
                             <option value="q1" selected>Quarter 1(Jan 1 - March 31)</option>
                             <option value="q2">Quarter 2(April 1 - Jun 30)</option>
                             <option value="q3">Quarter 3(July 1 - September 30)</option>
@@ -245,7 +257,7 @@
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Year</label>
-                        <select class="custom-select form-control">
+                        <select name="year" class="custom-select form-control">
                             <option value="2017" selected>2017</option>
                             <option value="2016">2016</option>
                             <option value="2015">2015</option>
