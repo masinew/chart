@@ -86,15 +86,22 @@
 
     <script>
         $(function() {
+            var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
             $('input[name="from"]').daterangepicker({
-                singleDatePicker: true
+                singleDatePicker: true,
+                startDate: maxDate,
+                maxDate: maxDate
             });
             $('input[name="to"]').daterangepicker({
-                singleDatePicker: true
+                singleDatePicker: true,
+                startDate: maxDate,
+                maxDate: maxDate
             });
         });
+        
         var target = document.getElementById('search_content_container');
         var form = document.getElementById('search_form');
+        var maxSubtractOfYear = 5;
 
         var radioDay = document.getElementById('search_day');
         var radioWeek = document.getElementById('search_week');
@@ -117,19 +124,23 @@
             alert(str);
             return false;
         }
-
-        $('body').on('submit', '#search_form', function(){
-            // console.log(this);
-        });
+        
+        function getCurrentDate() {
+            return '20170520';
+        }
 
         radioDay.addEventListener('click', function() {
             target.innerHTML = getDayHtmlCriteria();
             $(function() {
                 $('input[name="from"]').daterangepicker({
-                    singleDatePicker: true
+                    singleDatePicker: true,
+                    startDate: maxDate,
+                    maxDate: maxDate
                 });
                 $('input[name="to"]').daterangepicker({
-                    singleDatePicker: true
+                    singleDatePicker: true,
+                    startDate: maxDate,
+                    maxDate: maxDate
                 });
             });
         });
@@ -190,40 +201,47 @@
             `;
         }
 
-        function getMonthHtmlCriteria() {
-            return `
+        function getMonthHtmlCriteria(setYear = null) {
+            var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
+            var allMonths = moment.months();
+            var maxYear = maxDate.year();
+            var maxMonth = (setYear == null || setYear == maxYear) ? maxDate.month() : 11; // start index of month from 0
+            
+            var yearSelected = setYear == null ? maxYear : Number(setYear);
+            var str =  `
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Year</label>
-                        <select name="year" class="custom-select form-control">
-                            <option value="2017" selected>2017</option>
-                            <option value="2016">2016</option>
-                            <option value="2015">2015</option>
-                            <option value="2014">2014</option>
-                        </select>
+                        <select name="year" class="custom-select form-control" id="yearOfMonthCreteria">`;
+                        str += getYearOptions(maxYear, yearSelected);
+                        str += `</select>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Month</label>
-                        <select name="month" class="custom-select form-control">
-                            <option value="1" selected>January</option>
-                            <option value="2">Febuary</option>
-                            <option value="3">March</option>
-                            <option value="4">April</option>
-                            <option value="5">May</option>
-                            <option value="6">June</option>
-                            <option value="7">July</option>
-                            <option value="8">August</option>
-                            <option value="9">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
-                        </select>
+                        <select name="month" class="custom-select form-control">`;
+                        for (var i=0; i<=maxMonth; i++) {
+                            if (i == 0) {
+                                str += `<option value="${i+1}" selected>${allMonths[i]}</option>`;
+                                continue;
+                            }
+
+                            str += `<option value="${i+1}">${allMonths[i]}</option>`;
+                        }
+
+                        str += `</select>
                     </div>
                 </div>
             `;
+
+            return str;
         }
+
+        $(target).on('change', '#yearOfMonthCreteria', function() {
+            var yearSelected = $(this).find(':selected').text();
+            target.innerHTML = getMonthHtmlCriteria(yearSelected);
+        });
 
         function getQuarterHtmlCriteria() {
             return `
@@ -266,6 +284,21 @@
                     </div>
                 </div>
             `;
+        }
+
+        function getYearOptions(maxYear, yearSelected) {
+            var str = '';
+            for (var i=0; i<maxSubtractOfYear; i++) {
+                var tmpYear = maxYear - i;
+                if (tmpYear == yearSelected) {
+                    str += `<option value="${tmpYear}" selected>${tmpYear}</option>`;
+                    continue;
+                }
+
+                str += `<option value="${tmpYear}">${tmpYear}</option>`;
+            }
+
+            return str;
         }
     </script>
 </body>
