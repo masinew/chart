@@ -23,7 +23,7 @@
         <!-- Form -->
         <form id="search_form" onsubmit="return onSubmit()">
             <div class="row" style="padding-top: 50px;">
-                <div class="col-lg-6">
+                <div class="col-lg-8">
                     <!-- Search Panel -->
                     <div class="row">
                         <div class="col-lg-12">
@@ -175,32 +175,90 @@
             `;
         }
 
-        function getWeekHtmlCriteria() {
-            return `
+        function getWeekHtmlCriteria(setYear = null) {
+            var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
+            var maxYear = maxDate.year();
+            var yearSelected = setYear == null ? maxYear : Number(setYear);
+            var optionsStr = getAllWeeksOptionsStringByYear(yearSelected);
+            var str = `
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Year</label>
-                        <select name="year" class="custom-select form-control">
-                            <option value="2017" selected>2017</option>
-                            <option value="2016">2016</option>
-                            <option value="2015">2015</option>
-                            <option value="2014">2014</option>
-                        </select>
+                        <select name="year" class="custom-select form-control" id="yearOfWeekCriteria">`;
+                            str += getYearOptions(maxYear, yearSelected);
+                        str += `</select>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Week</label>
                         <select name="week" class="custom-select form-control">
-                            <option value="w1" selected>Week 1 (1-6 January)</option>
-                            <option value="w2">Week 2 (7-13 January)</option>
-                            <option value="w3">Week 3 (14-20 January)</option>
-                            <option value="w4">Week 4 (21-27 January)</option>
+                            ${optionsStr}
                         </select>
                     </div>
                 </div>
             `;
+
+            return str;
+
+            function getAllWeeksOptionsStringByYear(year) {
+                var weeksCount = countWeeksOfYear(year);
+                var firstDateOfYear = new Date(year, 0, 1);
+                var dayOfYear = firstDateOfYear.getDay();
+                var mFirstDateOfWeek = moment(firstDateOfYear).subtract(dayOfYear, 'days');
+                var str = '';
+                for (var i=1; i<=weeksCount; i++) {
+                    var start = moment(mFirstDateOfWeek);
+                    var end = moment(mFirstDateOfWeek.add(6, 'days'));
+                    if (dayOfYear != 0) {
+                        dayOfYear = 0;
+                        str += `<option value="${start.format('YYYYMMDD')},${end.format('YYYYMMDD')}" selected>Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
+                        mFirstDateOfWeek.add(1, 'days');
+                        continue;
+                    }
+
+                    if (i == 1) {
+                        str += `<option value="${start.format('YYYYMMDD')},${end.format('YYYYMMDD')}" selected>Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
+                        mFirstDateOfWeek.add(1, 'days');
+                        continue;
+                    }
+
+                    str += `<option value="${start.format('YYYYMMDD')},${end.format('YYYYMMDD')}">Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
+                    var tmp = moment(mFirstDateOfWeek);
+                    tmp.add(7, 'days');
+                    if (tmp.year() != year) break;
+
+                    mFirstDateOfWeek.add(1, 'days');
+                }
+
+                mFirstDateOfWeek.add(6, 'days');
+                if (mFirstDateOfWeek.year() == year) {
+                    str += `Week ${i}(${mFirstDateOfWeek.format('DD MMM YYYY')} - ${mFirstDateOfWeek.format('DD MMM YYYY')})`;
+                }
+
+                return str;               
+            }
+
+            function countWeeksOfYear(year) {
+                var d = new Date(year, 11, 31);
+                var week = getWeekNumber(d)[1];
+                return week == 1? getWeekNumber(d.setDate(24))[1] : week;
+
+                function getWeekNumber(d) {
+                    d = new Date(+d);
+                    d.setHours(0,0,0);
+                    d.setDate(d.getDate() + 4 - (d.getDay()||7));
+                    var yearStart = new Date(d.getFullYear(),0,1);
+                    var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7)
+                    return [d.getFullYear(), weekNo];
+                }
+            }
         }
+
+        $(target).on('change', '#yearOfWeekCriteria', function() {
+            var yearSelected = $(this).find(':selected').text();
+            target.innerHTML = getWeekHtmlCriteria(yearSelected);
+        })
 
         function getMonthHtmlCriteria(setYear = null) {
             var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
