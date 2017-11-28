@@ -126,12 +126,13 @@
         }
         
         function getCurrentDate() {
-            return '20170520';
+            return '20170220';
         }
 
         radioDay.addEventListener('click', function() {
             target.innerHTML = getDayHtmlCriteria();
             $(function() {
+                var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
                 $('input[name="from"]').daterangepicker({
                     singleDatePicker: true,
                     startDate: maxDate,
@@ -206,14 +207,13 @@
             var allMonths = moment.months();
             var maxYear = maxDate.year();
             var maxMonth = (setYear == null || setYear == maxYear) ? maxDate.month() : 11; // start index of month from 0
-            
             var yearSelected = setYear == null ? maxYear : Number(setYear);
             var str =  `
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Year</label>
                         <select name="year" class="custom-select form-control" id="yearOfMonthCreteria">`;
-                        str += getYearOptions(maxYear, yearSelected);
+                            str += getYearOptions(maxYear, yearSelected);
                         str += `</select>
                     </div>
                 </div>
@@ -243,47 +243,85 @@
             target.innerHTML = getMonthHtmlCriteria(yearSelected);
         });
 
-        function getQuarterHtmlCriteria() {
-            return `
+        function getQuarterHtmlCriteria(setYear = null) {
+            var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
+            var maxYear = maxDate.year();
+            var maxMonth = (setYear == null || setYear == maxYear) ? maxDate.month() : 11; // start index of month from 0
+            var yearSelected = setYear == null ? maxYear : Number(setYear);
+            var str = `
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Year</label>
-                        <select name="year" class="custom-select form-control">
-                            <option value="2017" selected>2017</option>
-                            <option value="2016">2016</option>
-                            <option value="2015">2015</option>
-                            <option value="2014">2014</option>
-                        </select>
+                        <select name="year" class="custom-select form-control" id="yearOfQuarterCriteria">`;
+                            str += getYearOptions(maxYear, yearSelected);
+                        str += `</select>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Quarter</label>
-                        <select name="quarter" class="custom-select form-control">
-                            <option value="q1" selected>Quarter 1(Jan 1 - March 31)</option>
-                            <option value="q2">Quarter 2(April 1 - Jun 30)</option>
-                            <option value="q3">Quarter 3(July 1 - September 30)</option>
-                            <option value="q4">Quarter 4(October 1 - December 31)</option>
-                        </select>
+                        <select name="quarter" class="custom-select form-control">`;
+                            for (var i=1; i<=4; i++) {
+                                if (!checkQuarter(maxDate, i, setYear)) continue;
+                                if (i == 1) {
+                                    str += `<option value="q${i}" selected>${getLabel(i)}</option>`;
+                                    continue;
+                                }
+
+                                str += `<option value="q${i}">${getLabel(i)}</option>`;
+                            }
+
+                        str += `</select>
                     </div>
                 </div>
             `;
+
+            return str;
+
+            function checkQuarter(maxDate, index, setYear) {
+                // TODO: when change year back to 2017 the quarter labels are wrong
+                var thisYear = setYear == null ? maxDate.year() : setYear;
+                var thisMonth = (setYear == null || maxDate.year() == setYear) ? maxDate.month() + 1 : 12;
+                var tmpDate = (setYear == null || maxDate.year() == setYear) ? maxDate : moment(thisYear + '-12-31');
+                switch(index) {
+                    case 1: return (tmpDate.isBetween(thisYear + '-01-01', thisYear + '-03-31', null, '[]') || thisMonth > 3);
+                    case 2: return (tmpDate.isBetween(thisYear + '-04-01', thisYear + '-06-30', null, '[]') || thisMonth > 6);
+                    case 3: return (tmpDate.isBetween(thisYear + '-07-01', thisYear + '-09-30', null, '[]') || thisMonth > 9);
+                    case 4: return tmpDate.isBetween(thisYear + '-10-01', thisYear + '-12-31', null, '[]');
+                }
+            }
+
+            function getLabel(index) {
+                switch(index) {
+                    case 1: return 'Quarter 1(Jan 1 - March 31)';
+                    case 2: return 'Quarter 2(April 1 - Jun 30)';
+                    case 3: return 'Quarter 3(July 1 - September 30)';
+                    case 4: return 'Quarter 4(October 1 - December 31)';
+                }
+            }
         }
 
-        function getYearHtmlCriteria() {
-            return `
+        $(target).on('change', '#yearOfQuarterCriteria', function() {
+            var yearSelected = $(this).find(':selected').text();
+            target.innerHTML = getQuarterHtmlCriteria(yearSelected);
+        });
+
+        function getYearHtmlCriteria(setYear = null) {
+            var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
+            var maxYear = maxDate.year();
+            var yearSelected = setYear == null ? maxYear : Number(setYear);
+            var str = `
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="col-form-label" for="formGroupExampleInput">Year</label>
-                        <select name="year" class="custom-select form-control">
-                            <option value="2017" selected>2017</option>
-                            <option value="2016">2016</option>
-                            <option value="2015">2015</option>
-                            <option value="2014">2014</option>
-                        </select>
+                        <select name="year" class="custom-select form-control">`;
+                            str += getYearOptions(maxYear, yearSelected);
+                        str += `</select>
                     </div>
                 </div>
             `;
+
+            return str;
         }
 
         function getYearOptions(maxYear, yearSelected) {
