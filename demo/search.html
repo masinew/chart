@@ -20,6 +20,11 @@
 </head>
 <body>
     <div class="container">
+        <div class="row">
+            <div class="col-lg">
+                <h2 id="serverDate"></h2>
+            </div>
+        </div>
         <!-- Form -->
         <form id="search_form" onsubmit="return onSubmit()">
             <div class="row" style="padding-top: 50px;">
@@ -73,7 +78,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <button type="submit" id="submit" class="btn btn-primary">Apply</button>
-                                <button type="reset" class="btn btn-default">Cancel</button>
+                                <button type="button" onclick="setupDatePcikerToDefault()" class="btn btn-default">Cancel</button>
                             </div>
                         </div>
                     
@@ -85,18 +90,9 @@
     </div>
 
     <script>
+        document.getElementById('serverDate').innerHTML = 'Server Date: ' + moment(getServerDate(), getYearFormat()).format('DD MMM YYYY');
         $(function() {
-            var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
-            $('input[name="from"]').daterangepicker({
-                singleDatePicker: true,
-                startDate: maxDate,
-                maxDate: maxDate
-            });
-            $('input[name="to"]').daterangepicker({
-                singleDatePicker: true,
-                startDate: maxDate,
-                maxDate: maxDate
-            });
+            setupDatePcikerToDefault();
         });
         
         var target = document.getElementById('search_content_container');
@@ -125,24 +121,51 @@
             return false;
         }
         
-        function getCurrentDate() {
-            return '20170220';
+        function getServerDate() {
+            return '20170226';
+        }
+
+        function getYearFormat() {
+            return 'YYYYMMDD';
+        }
+
+        function getDatePickerOptions(maxDate) {
+            return {
+                locale: {
+                  format: 'DD MMM YYYY'
+                },
+                singleDatePicker: true,
+                startDate: maxDate,
+                maxDate: maxDate
+            }
+        }
+
+        function afterFromDatePickerSelected(start, end) {
+            console.log(1);
+            var maxDate = moment(getServerDate(), getYearFormat());
+            $('input[name="to"]').daterangepicker(Object.assign({}, getDatePickerOptions(maxDate), {
+                minDate: start
+            }), afterToDatePickerSelected);
+        }
+
+        function afterToDatePickerSelected(start, end) {
+            console.log(1);
+            var maxDate = moment(getServerDate(), getYearFormat());
+            $('input[name="from"]').daterangepicker(Object.assign({}, getDatePickerOptions(maxDate), {
+                maxDate: start
+            }), afterFromDatePickerSelected);
+        }
+
+        function setupDatePcikerToDefault() {
+            var maxDate = moment(getServerDate(), getYearFormat());
+            $('input[name="from"]').daterangepicker(getDatePickerOptions(maxDate), afterFromDatePickerSelected);
+            $('input[name="to"]').daterangepicker(getDatePickerOptions(maxDate), afterToDatePickerSelected);
         }
 
         radioDay.addEventListener('click', function() {
             target.innerHTML = getDayHtmlCriteria();
             $(function() {
-                var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
-                $('input[name="from"]').daterangepicker({
-                    singleDatePicker: true,
-                    startDate: maxDate,
-                    maxDate: maxDate
-                });
-                $('input[name="to"]').daterangepicker({
-                    singleDatePicker: true,
-                    startDate: maxDate,
-                    maxDate: maxDate
-                });
+                setupDatePcikerToDefault();
             });
         });
         radioWeek.addEventListener('click', function() {
@@ -176,10 +199,10 @@
         }
 
         function getWeekHtmlCriteria(setYear = null) {
-            var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
+            var maxDate = moment(getServerDate(), getYearFormat());
             var maxYear = maxDate.year();
             var yearSelected = setYear == null ? maxYear : Number(setYear);
-            var optionsStr = getAllWeeksOptionsStringByYear(yearSelected);
+            var optionsStr = getAllWeeksOptionsStringByYear(yearSelected, maxDate);
             var str = `
                 <div class="col-lg-6">
                     <div class="form-group">
@@ -201,29 +224,38 @@
 
             return str;
 
-            function getAllWeeksOptionsStringByYear(year) {
+            function getAllWeeksOptionsStringByYear(year, maxDate) {
                 var weeksCount = countWeeksOfYear(year);
                 var firstDateOfYear = new Date(year, 0, 1);
                 var dayOfYear = firstDateOfYear.getDay();
                 var mFirstDateOfWeek = moment(firstDateOfYear).subtract(dayOfYear, 'days');
                 var str = '';
+                var isOver = 0;
                 for (var i=1; i<=weeksCount; i++) {
                     var start = moment(mFirstDateOfWeek);
                     var end = moment(mFirstDateOfWeek.add(6, 'days'));
+                    if (start.isAfter(maxDate)) {
+                        isOver = 1;
+                        break;
+                    }
+
                     if (dayOfYear != 0) {
                         dayOfYear = 0;
-                        str += `<option value="${start.format('YYYYMMDD')},${end.format('YYYYMMDD')}" selected>Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
+                        str += `<option value="${start.format(getYearFormat())},${end.format(getYearFormat())}" selected>
+                            Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
                         mFirstDateOfWeek.add(1, 'days');
                         continue;
                     }
 
                     if (i == 1) {
-                        str += `<option value="${start.format('YYYYMMDD')},${end.format('YYYYMMDD')}" selected>Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
+                        str += `<option value="${start.format(getYearFormat())},${end.format(getYearFormat())}" selected>
+                            Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
                         mFirstDateOfWeek.add(1, 'days');
                         continue;
                     }
 
-                    str += `<option value="${start.format('YYYYMMDD')},${end.format('YYYYMMDD')}">Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
+                    str += `<option value="${start.format(getYearFormat())},${end.format(getYearFormat())}">
+                        Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
                     var tmp = moment(mFirstDateOfWeek);
                     tmp.add(7, 'days');
                     if (tmp.year() != year) break;
@@ -231,9 +263,11 @@
                     mFirstDateOfWeek.add(1, 'days');
                 }
 
-                mFirstDateOfWeek.add(6, 'days');
-                if (mFirstDateOfWeek.year() == year) {
-                    str += `Week ${i}(${mFirstDateOfWeek.format('DD MMM YYYY')} - ${mFirstDateOfWeek.format('DD MMM YYYY')})`;
+                var start = moment(mFirstDateOfWeek);
+                var end = moment(mFirstDateOfWeek.add(6, 'days'));
+                if (end.year() == year && isOver == 0) {
+                    str += `<option value="${start.format(getYearFormat())},${end.format(getYearFormat())}">
+                        Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
                 }
 
                 return str;               
@@ -261,7 +295,7 @@
         })
 
         function getMonthHtmlCriteria(setYear = null) {
-            var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
+            var maxDate = moment(getServerDate(), getYearFormat());
             var allMonths = moment.months();
             var maxYear = maxDate.year();
             var maxMonth = (setYear == null || setYear == maxYear) ? maxDate.month() : 11; // start index of month from 0
@@ -302,7 +336,7 @@
         });
 
         function getQuarterHtmlCriteria(setYear = null) {
-            var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
+            var maxDate = moment(getServerDate(), getYearFormat());
             var maxYear = maxDate.year();
             var maxMonth = (setYear == null || setYear == maxYear) ? maxDate.month() : 11; // start index of month from 0
             var yearSelected = setYear == null ? maxYear : Number(setYear);
@@ -365,7 +399,7 @@
         });
 
         function getYearHtmlCriteria(setYear = null) {
-            var maxDate = moment(getCurrentDate(), 'YYYYMMDD');
+            var maxDate = moment(getServerDate(), getYearFormat());
             var maxYear = maxDate.year();
             var yearSelected = setYear == null ? maxYear : Number(setYear);
             var str = `
