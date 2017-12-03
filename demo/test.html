@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>TESt</title>
+		<!-- Style Sheet -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+		<link rel="stylesheet" type="text/css" href="http://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/bootstrap-clockpicker.css" />
+	
+		<!-- JS Resource -->
+		<script type="text/javascript" src="http://cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+		<script type="text/javascript" src="http://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+		<script type="text/javascript" src="http://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/bootstrap-clockpicker.js"></script>
+		<style>
+
+		.dropdown {
+			position: relative;
+			display: inline-block;
+		}
+		.show_criteria_search{display:block;}
+
+		.input_criteria_search{
+			padding:8px;
+			display:block;
+			border:none;
+			border-bottom:1px solid #ccc;
+			width:100%;
+			background-color: #F7F8F9
+		}
+		.box_criteria_date {
+			width: 600px;
+			height: 100%;
+			background-color: white;
+			padding: 25px 25px 25px 25px;
+		/*  	border-radius: 10px;  */
+		/*  background-color: #FFFFFF; */
+		/* 	background-color: var(--white); */
+		/* 	box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1); */
+		/* 	border: solid 1px #e4eff6; */
+		}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-4 dropdown">
+					<!--  -->
+						<input type="text" class="form-control" onclick="handleCriterialDate()" id="duringDateSelection" />
+		
+						<div id="box_criteria_date" class="dropdown-menu" role="menu">
+							<div class="box_criteria_date">
+								<div class="container">
+										<!-- <div class="row">
+											<div class="col-lg">
+												<h2 id="serverDate"></h2>
+											</div>
+										</div> -->
+										<div class="row">
+											<div class="col-lg">
+												<a onclick="handleCriterialDate()" class="close" href="#">&times;</a>
+											</div>
+										</div>
+										<!-- Form -->
+										<form id="search_form" onsubmit="return onSubmit()">
+											<div class="row">
+												<div class="col-lg-12">
+													<!-- Search Panel -->
+													<div class="row">
+														<div class="col-lg-12">
+															<div class="form-check form-check-inline">
+																<label class="form-check-label">
+																	<input class="form-check-input" type="radio" name="search_criteria" id="search_day" value="date" checked> Date
+																</label>
+															</div>
+															<div class="form-check form-check-inline">
+																<label class="form-check-label">
+																	<input class="form-check-input" type="radio" name="search_criteria" id="search_week" value="week"> Week
+																</label>
+															</div>
+															<div class="form-check form-check-inline">
+																<label class="form-check-label">
+																	<input class="form-check-input" type="radio" name="search_criteria" id="search_month" value="month"> Month
+																</label>
+															</div>
+															<div class="form-check form-check-inline">
+																<label class="form-check-label">
+																	<input class="form-check-input" type="radio" name="search_criteria" id="search_quarter" value="quarter"> Quarter
+																</label>
+															</div>
+															<div class="form-check form-check-inline">
+																<label class="form-check-label">
+																	<input class="form-check-input" type="radio" name="search_criteria" id="search_year" value="year"> Year
+																</label>
+															</div>
+														</div>
+													</div>
+													<hr/>
+													
+														<div class="row" id="search_content_container">
+															<div class="col-lg-6">
+																<div class="form-group">
+																	<label class="col-form-label" for="formGroupExampleInput">From</label>
+																	<input class="form-control" type="text" name="from" value="" />
+																</div>
+															</div>
+															<div class="col-lg-6">
+																<div class="form-group">
+																	<label class="col-form-label" for="formGroupExampleInput">To</label>
+																	<input class="form-control" type="text" name="to" value="" />
+																</div>
+															</div>
+														</div>
+														<div class="row">
+															<div class="col-lg-12">
+																<button type="submit" id="submit" class="btn btn-primary">Apply</button>
+																<button type="button" onclick="setupDatePcikerToDefault()" class="btn btn-default">Cancel</button>
+															</div>
+														</div>
+													
+													<!-- Search Panel -->
+												</div>
+											</div>
+											<!-- Form -->
+										</form>
+									</div>
+								
+									<script>
+										// document.getElementById('serverDate').innerHTML = 'Server Date: ' + moment(getServerDate(), getYearFormat()).format('DD MMM YYYY');
+										$(function() {
+											setupDatePcikerToDefault();
+										});
+										
+										var target = document.getElementById('search_content_container');
+										var form = document.getElementById('search_form');
+										var maxSubtractOfYear = 5;
+								
+										var radioDay = document.getElementById('search_day');
+										var radioWeek = document.getElementById('search_week');
+										var radioMonth = document.getElementById('search_month');
+										var radioQuarter = document.getElementById('search_quarter');
+										var radioYear = document.getElementById('search_year');
+								
+										function onSubmit() {
+											var allData = $("#search_form").serializeArray();
+											var type = allData[0].value;
+											var str = '';
+											switch(type) {
+												case 'date': str = handleDateCriteria(allData); break;
+												case 'week': str = handleWeekCriteria(allData); break;
+												case 'month': str = handleMonthCriteria(allData); break;
+												case 'year': str = handleYearCriteria(allData); break;
+											}
+
+											document.getElementById('duringDateSelection').value = str;
+											handleCriterialDate();
+								
+											return false;
+
+											function handleDateCriteria(data) {
+												return data[1].value + ' - ' + data[2].value;
+											}
+
+											function handleWeekCriteria(data) {
+												var dataList = data[2].value.split(",");
+												var from = moment(dataList[0], 'YYYYMMDD').format('DD MMM YYYY');
+												var to = moment(dataList[1], 'YYYYMMDD').format('DD MMM YYYY');
+												return from + ' - ' + to;
+											}
+
+											function handleMonthCriteria(data) {
+												var year = data[1].value;
+												var month = data[2].value.toString();
+												var handledMonth = month.length == 1 ? '0' + month : month;
+												var from = moment(year + handledMonth + '01', 'YYYYMMDD').format('DD MMM YYYY');
+												var mThisMonth = moment(year + handledMonth, 'YYYYMM');
+												var daysInThisMonth = mThisMonth.daysInMonth();
+												var to = moment(year + handledMonth + daysInThisMonth, 'YYYYMMDD').format('DD MMM YYYY');
+												return from + ' - ' + to;
+											}
+
+											function handleYearCriteria(data) {
+												var year = data[1].value;
+												var from = moment(year + '0101').format('DD MMM YYYY');
+												var to = moment(year + '1231').format('DD MMM YYYY');
+												return from + ' - ' + to;
+											}
+										}
+										
+										function getServerDate() {
+											return '20170226';
+										}
+								
+										function getYearFormat() {
+											return 'YYYYMMDD';
+										}
+								
+										function getDatePickerOptions(maxDate) {
+											return {
+												locale: {
+													format: 'DD MMM YYYY'
+												},
+												singleDatePicker: true,
+												startDate: maxDate,
+												maxDate: maxDate
+											}
+										}
+								
+										function afterFromDatePickerSelected(start, end) {
+											console.log(1);
+											var maxDate = moment(getServerDate(), getYearFormat());
+											$('input[name="to"]').daterangepicker(Object.assign({}, getDatePickerOptions(maxDate), {
+												minDate: start
+											}), afterToDatePickerSelected);
+										}
+								
+										function afterToDatePickerSelected(start, end) {
+											console.log(1);
+											var maxDate = moment(getServerDate(), getYearFormat());
+											$('input[name="from"]').daterangepicker(Object.assign({}, getDatePickerOptions(maxDate), {
+												maxDate: start
+											}), afterFromDatePickerSelected);
+										}
+								
+										function setupDatePcikerToDefault() {
+											var maxDate = moment(getServerDate(), getYearFormat());
+											$('input[name="from"]').daterangepicker(getDatePickerOptions(maxDate), afterFromDatePickerSelected);
+											$('input[name="to"]').daterangepicker(getDatePickerOptions(maxDate), afterToDatePickerSelected);
+										}
+								
+										radioDay.addEventListener('click', function() {
+											target.innerHTML = getDayHtmlCriteria();
+											$(function() {
+												setupDatePcikerToDefault();
+											});
+										});
+										radioWeek.addEventListener('click', function() {
+											target.innerHTML = getWeekHtmlCriteria();
+										});
+										radioMonth.addEventListener('click', function() {
+											target.innerHTML = getMonthHtmlCriteria();
+										});
+										radioQuarter.addEventListener('click', function() {
+											target.innerHTML = getQuarterHtmlCriteria();
+										});
+										radioYear.addEventListener('click', function() {
+											target.innerHTML = getYearHtmlCriteria();
+										});
+								
+										function getDayHtmlCriteria() {
+											return `
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label class="col-form-label" for="formGroupExampleInput">From</label>
+														<input class="form-control" type="text" name="from" value="" />
+													</div>
+												</div>
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label class="col-form-label" for="formGroupExampleInput">To</label>
+														<input class="form-control" type="text" name="to" value="" />
+													</div>
+												</div>
+											`;
+										}
+								
+										function getWeekHtmlCriteria(setYear = null) {
+											var maxDate = moment(getServerDate(), getYearFormat());
+											var maxYear = maxDate.year();
+											var yearSelected = setYear == null ? maxYear : Number(setYear);
+											var optionsStr = getAllWeeksOptionsStringByYear(yearSelected, maxDate);
+											var str = `
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label class="col-form-label" for="formGroupExampleInput">Year</label>
+														<select name="year" class="custom-select form-control" id="yearOfWeekCriteria">`;
+															str += getYearOptions(maxYear, yearSelected);
+														str += `</select>
+													</div>
+												</div>
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label class="col-form-label" for="formGroupExampleInput">Week</label>
+														<select name="week" class="custom-select form-control">
+															${optionsStr}
+														</select>
+													</div>
+												</div>
+											`;
+								
+											return str;
+								
+											function getAllWeeksOptionsStringByYear(year, maxDate) {
+												var weeksCount = countWeeksOfYear(year);
+												var firstDateOfYear = new Date(year, 0, 1);
+												var dayOfYear = firstDateOfYear.getDay();
+												var mFirstDateOfWeek = moment(firstDateOfYear).subtract(dayOfYear, 'days');
+												var str = '';
+												var isOver = 0;
+												for (var i=1; i<=weeksCount; i++) {
+													var start = moment(mFirstDateOfWeek);
+													var end = moment(mFirstDateOfWeek.add(6, 'days'));
+													if (start.isAfter(maxDate)) {
+														isOver = 1;
+														break;
+													}
+								
+													if (dayOfYear != 0) {
+														dayOfYear = 0;
+														str += `<option value="${start.format(getYearFormat())},${end.format(getYearFormat())}" selected>
+															Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
+														mFirstDateOfWeek.add(1, 'days');
+														continue;
+													}
+								
+													if (i == 1) {
+														str += `<option value="${start.format(getYearFormat())},${end.format(getYearFormat())}" selected>
+															Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
+														mFirstDateOfWeek.add(1, 'days');
+														continue;
+													}
+								
+													str += `<option value="${start.format(getYearFormat())},${end.format(getYearFormat())}">
+														Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
+													var tmp = moment(mFirstDateOfWeek);
+													tmp.add(7, 'days');
+													if (tmp.year() != year) break;
+								
+													mFirstDateOfWeek.add(1, 'days');
+												}
+								
+												var start = moment(mFirstDateOfWeek);
+												var end = moment(mFirstDateOfWeek.add(6, 'days'));
+												if (end.year() == year && isOver == 0) {
+													str += `<option value="${start.format(getYearFormat())},${end.format(getYearFormat())}">
+														Week ${i}(${start.format('DD MMM YYYY')} - ${end.format('DD MMM YYYY')})</option>`;
+												}
+								
+												return str;               
+											}
+								
+											function countWeeksOfYear(year) {
+												var d = new Date(year, 11, 31);
+												var week = getWeekNumber(d)[1];
+												return week == 1? getWeekNumber(d.setDate(24))[1] : week;
+								
+												function getWeekNumber(d) {
+													d = new Date(+d);
+													d.setHours(0,0,0);
+													d.setDate(d.getDate() + 4 - (d.getDay()||7));
+													var yearStart = new Date(d.getFullYear(),0,1);
+													var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7)
+													return [d.getFullYear(), weekNo];
+												}
+											}
+										}
+								
+										$(target).on('change', '#yearOfWeekCriteria', function() {
+											var yearSelected = $(this).find(':selected').text();
+											target.innerHTML = getWeekHtmlCriteria(yearSelected);
+										})
+								
+										function getMonthHtmlCriteria(setYear = null) {
+											var maxDate = moment(getServerDate(), getYearFormat());
+											var allMonths = moment.months();
+											var maxYear = maxDate.year();
+											var maxMonth = (setYear == null || setYear == maxYear) ? maxDate.month() : 11; // start index of month from 0
+											var yearSelected = setYear == null ? maxYear : Number(setYear);
+											var str =  `
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label class="col-form-label" for="formGroupExampleInput">Year</label>
+														<select name="year" class="custom-select form-control" id="yearOfMonthCreteria">`;
+															str += getYearOptions(maxYear, yearSelected);
+														str += `</select>
+													</div>
+												</div>
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label class="col-form-label" for="formGroupExampleInput">Month</label>
+														<select name="month" class="custom-select form-control">`;
+														for (var i=0; i<=maxMonth; i++) {
+															if (i == 0) {
+																str += `<option value="${i+1}" selected>${allMonths[i]}</option>`;
+																continue;
+															}
+								
+															str += `<option value="${i+1}">${allMonths[i]}</option>`;
+														}
+								
+														str += `</select>
+													</div>
+												</div>
+											`;
+								
+											return str;
+										}
+								
+										$(target).on('change', '#yearOfMonthCreteria', function() {
+											var yearSelected = $(this).find(':selected').text();
+											target.innerHTML = getMonthHtmlCriteria(yearSelected);
+										});
+								
+										function getQuarterHtmlCriteria(setYear = null) {
+											var maxDate = moment(getServerDate(), getYearFormat());
+											var maxYear = maxDate.year();
+											var maxMonth = (setYear == null || setYear == maxYear) ? maxDate.month() : 11; // start index of month from 0
+											var yearSelected = setYear == null ? maxYear : Number(setYear);
+											var str = `
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label class="col-form-label" for="formGroupExampleInput">Year</label>
+														<select name="year" class="custom-select form-control" id="yearOfQuarterCriteria">`;
+															str += getYearOptions(maxYear, yearSelected);
+														str += `</select>
+													</div>
+												</div>
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label class="col-form-label" for="formGroupExampleInput">Quarter</label>
+														<select name="quarter" class="custom-select form-control">`;
+															for (var i=1; i<=4; i++) {
+																if (!checkQuarter(maxDate, i, setYear)) continue;
+																if (i == 1) {
+																	str += `<option value="q${i}" selected>${getLabel(i)}</option>`;
+																	continue;
+																}
+								
+																str += `<option value="q${i}">${getLabel(i)}</option>`;
+															}
+								
+														str += `</select>
+													</div>
+												</div>
+											`;
+								
+											return str;
+								
+											function checkQuarter(maxDate, index, setYear) {
+												// TODO: when change year back to 2017 the quarter labels are wrong
+												var thisYear = setYear == null ? maxDate.year() : setYear;
+												var thisMonth = (setYear == null || maxDate.year() == setYear) ? maxDate.month() + 1 : 12;
+												var tmpDate = (setYear == null || maxDate.year() == setYear) ? maxDate : moment(thisYear + '-12-31');
+												switch(index) {
+													case 1: return (tmpDate.isBetween(thisYear + '-01-01', thisYear + '-03-31', null, '[]') || thisMonth > 3);
+													case 2: return (tmpDate.isBetween(thisYear + '-04-01', thisYear + '-06-30', null, '[]') || thisMonth > 6);
+													case 3: return (tmpDate.isBetween(thisYear + '-07-01', thisYear + '-09-30', null, '[]') || thisMonth > 9);
+													case 4: return tmpDate.isBetween(thisYear + '-10-01', thisYear + '-12-31', null, '[]');
+												}
+											}
+								
+											function getLabel(index) {
+												switch(index) {
+													case 1: return 'Quarter 1(Jan 1 - March 31)';
+													case 2: return 'Quarter 2(April 1 - Jun 30)';
+													case 3: return 'Quarter 3(July 1 - September 30)';
+													case 4: return 'Quarter 4(October 1 - December 31)';
+												}
+											}
+										}
+								
+										$(target).on('change', '#yearOfQuarterCriteria', function() {
+											var yearSelected = $(this).find(':selected').text();
+											target.innerHTML = getQuarterHtmlCriteria(yearSelected);
+										});
+								
+										function getYearHtmlCriteria(setYear = null) {
+											var maxDate = moment(getServerDate(), getYearFormat());
+											var maxYear = maxDate.year();
+											var yearSelected = setYear == null ? maxYear : Number(setYear);
+											var str = `
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label class="col-form-label" for="formGroupExampleInput">Year</label>
+														<select name="year" class="custom-select form-control">`;
+															str += getYearOptions(maxYear, yearSelected);
+														str += `</select>
+													</div>
+												</div>
+											`;
+								
+											return str;
+										}
+								
+										function getYearOptions(maxYear, yearSelected) {
+											var str = '';
+											for (var i=0; i<maxSubtractOfYear; i++) {
+												var tmpYear = maxYear - i;
+												if (tmpYear == yearSelected) {
+													str += `<option value="${tmpYear}" selected>${tmpYear}</option>`;
+													continue;
+												}
+								
+												str += `<option value="${tmpYear}">${tmpYear}</option>`;
+											}
+								
+											return str;
+										}
+									</script>
+							</div>
+						</div>
+					<!--  -->
+				</div>
+				<div class="col-lg">
+					
+				</div>
+				<div class="col-lg">
+					
+				</div>
+			</div>
+		</div>
+			
+
+		<script>
+
+			function handleCriterialDate() {
+				document.getElementById("box_criteria_date").classList.toggle("show_criteria_search");
+			}
+		</script>
+	</body>
+</html>
