@@ -28,7 +28,7 @@
 			width:100%;
 			background-color: #F7F8F9
 		}
-		.box_criteria_date {
+		.box_criteria_date, .box_criteria_time {
 			width: 600px;
 			height: 100%;
 			background-color: white;
@@ -101,26 +101,26 @@
 													</div>
 													<hr/>
 													
-														<div class="row" id="search_content_container">
-															<div class="col-lg-6">
-																<div class="form-group">
-																	<label class="col-form-label" for="formGroupExampleInput">From</label>
-																	<input class="form-control" type="text" name="from" value="" />
-																</div>
-															</div>
-															<div class="col-lg-6">
-																<div class="form-group">
-																	<label class="col-form-label" for="formGroupExampleInput">To</label>
-																	<input class="form-control" type="text" name="to" value="" />
-																</div>
+													<div class="row" id="search_content_container">
+														<div class="col-lg-6">
+															<div class="form-group">
+																<label class="col-form-label" for="formGroupExampleInput">From</label>
+																<input class="form-control" type="text" name="from" value="" />
 															</div>
 														</div>
-														<div class="row">
-															<div class="col-lg-12">
-																<button type="submit" id="submit" class="btn btn-primary">Apply</button>
-																<button type="button" onclick="setupDatePcikerToDefault()" class="btn btn-default">Cancel</button>
+														<div class="col-lg-6">
+															<div class="form-group">
+																<label class="col-form-label" for="formGroupExampleInput">To</label>
+																<input class="form-control" type="text" name="to" value="" />
 															</div>
 														</div>
+													</div>
+													<div class="row">
+														<div class="col-lg-12">
+															<button type="submit" id="submit" class="btn btn-primary">Apply</button>
+															<button type="button" onclick="setupDatePcikerToDefault()" class="btn btn-default">Cancel</button>
+														</div>
+													</div>
 													
 													<!-- Search Panel -->
 												</div>
@@ -506,14 +506,55 @@
 					<!--  -->
 				</div>
 				<div class="col-lg">
-					<div class="input-group clockpicker">
-						<input type="text" class="form-control" id="clockPickerInfo">
+					<input type="text" class="form-control" onclick="handleCriterialTime()" id="duringTimeSelection" value="00:00 - 00:00" />
+					<div id="box_criteria_time" class="dropdown-menu" role="menu">
+						<div class="box_criteria_time">
+							<div class="container">
+								<!--  -->
+								<div class="row">
+									<div class="col-lg-6">
+										<input type="text" class="form-control" id="clockPickerFromInfo" value="00:00" />
+									</div>
+									<div class="col-lg-6">
+										<input type="text" class="form-control" id="clockPickerToInfo" value="00:00" />
+									</div>
+								</div>
+								<script type="text/javascript">
+									var clockPickerFromInfo = $('#clockPickerFromInfo').clockpicker({
+										donetext: 'Apply'
+									});
+
+									var clockPickerToInfo = $('#clockPickerToInfo').clockpicker({
+										donetext: 'Apply'
+									});
+
+									function handleCriterialTimeSubmit() {
+										var from = $('#clockPickerFromInfo').val();
+										var to = $('#clockPickerToInfo').val();
+										$('#duringTimeSelection').val(from + ' - ' + to);
+										handleCriterialTime();
+									}
+								</script> 
+								<!--  -->
+
+								<div class="row main-row">
+									<div class="col-lg-12">
+										<button type="submit" id="submit2" onclick="handleCriterialTimeSubmit()" class="btn btn-primary">Apply</button>
+										<button type="button" onclick="handleCriterialTime()" class="btn btn-default">Cancel</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- <div class="input-group clockpicker">
+						<input type="text" class="form-control" id="clockPickerInfo" />
 					</div>
 					<script type="text/javascript">
 						$('.clockpicker').clockpicker({
 							donetext: 'Apply'
 						});
-					</script>
+					</script> 
+				-->
 				</div>
 				<div class="col-lg">
 					<select name="camera" class="form-control" id="locationInfo">
@@ -536,6 +577,10 @@
 
 			function handleCriterialDate() {
 				document.getElementById("box_criteria_date").classList.toggle("show_criteria_search");
+			}
+
+			function handleCriterialTime() {
+				document.getElementById("box_criteria_time").classList.toggle("show_criteria_search");
 			}
 
 			function onMainSearchSubmit() {
