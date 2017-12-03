@@ -60,11 +60,6 @@
 												<h2 id="serverDate"></h2>
 											</div>
 										</div> -->
-										<div class="row">
-											<div class="col-lg">
-												<a onclick="handleCriterialDate()" class="close" href="#">&times;</a>
-											</div>
-										</div>
 										<!-- Form -->
 										<form id="search_form" onsubmit="return onSubmit()">
 											<div class="row">
@@ -118,7 +113,7 @@
 													<div class="row">
 														<div class="col-lg-12">
 															<button type="submit" id="submit" class="btn btn-primary">Apply</button>
-															<button type="button" onclick="setupDatePcikerToDefault()" class="btn btn-default">Cancel</button>
+															<button type="button" onclick="handleCriterialDate()" class="btn btn-default">Cancel</button>
 														</div>
 													</div>
 													
@@ -584,12 +579,18 @@
 			}
 
 			function onMainSearchSubmit() {
-				console.log($('#duringDateSelection').val());
-				console.log($('#clockPickerInfo').val());
-				console.log($('#locationInfo').val());
+				// console.log($('#duringDateSelection').val());
+				// console.log($('#clockPickerInfo').val());
+				// console.log($('#locationInfo').val());
 				
 				return false;
 			}
+			function setDefaultDuringDateSelection() {
+				var defaultDate = moment(getServerDate(), getYearFormat()).format('DD MMM YYYY');
+				return defaultDate + ' - ' + defaultDate;
+			}
+
+			$('#duringDateSelection').val(setDefaultDuringDateSelection());
 
 		</script>
 	</body>
