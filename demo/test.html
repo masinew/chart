@@ -148,6 +148,7 @@
 												case 'date': str = handleDateCriteria(allData); break;
 												case 'week': str = handleWeekCriteria(allData); break;
 												case 'month': str = handleMonthCriteria(allData); break;
+												case 'quarter' : str = handleQuaterCriteria(allData); break;
 												case 'year': str = handleYearCriteria(allData); break;
 											}
 
@@ -176,6 +177,41 @@
 												var daysInThisMonth = mThisMonth.daysInMonth();
 												var to = moment(year + handledMonth + daysInThisMonth, 'YYYYMMDD').format('DD MMM YYYY');
 												return from + ' - ' + to;
+											}
+
+											function handleQuaterCriteria(data) {
+												var year = data[1].value;
+												var quarter = data[2].value;
+												var str = ''
+												switch(quarter) {
+													case 'q1': 
+														str = generateDateString(
+															moment(year + '0101', getYearFormat()), 
+															moment(year + '0331', getYearFormat()));
+														break;
+													case 'q2':
+														str = generateDateString(
+															moment(year + '0401', getYearFormat()), 
+															moment(year + '0630', getYearFormat()));
+														break;
+													case 'q3':
+														str = generateDateString(
+															moment(year + '0701', getYearFormat()), 
+															moment(year + '0930', getYearFormat()));
+														break;
+													case 'q4':
+														str = generateDateString(
+															moment(year + '1001', getYearFormat()), 
+															moment(year + '1231', getYearFormat()));
+														break;
+													default: str = 'Quarter Not Match'
+												}
+
+												return str;
+
+												function generateDateString(from, to) {
+													return from.format('DD MMM YYYY') + ' - ' + to.format('DD MMM YYYY');
+												}
 											}
 
 											function handleYearCriteria(data) {
